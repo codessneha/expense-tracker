@@ -13,6 +13,8 @@ import SignUp from './pages/auth/signup';
 import Home from './pages/dashboard/home';
 import Income from './pages/dashboard/income';
 import Expense from './pages/dashboard/expense';
+import { Toaster } from 'react-hot-toast';
+import { ToastContainer } from 'react-toastify';
 
 const Root = () => {
   const isAuthenticated = !!localStorage.getItem('token');
@@ -38,6 +40,14 @@ const App = () => {
         </Routes>
       </Router>
     </div>
+    <Toaster
+    toastOptions={{
+      className:"bg-white text-black",
+      style:{
+        fontSize:"14px"
+      }
+    }}
+    />
     </UserProvider>
   );
 };

@@ -30,3 +30,9 @@
 .card-btn{
     @apply flex items-center gap-3 text-[12px] font-medium text-gray-600 hover:text-purple-500 bg-gray-50 hover:bg-purple-50 px-4 py-1.5 rounded-lg border border-gray-200/50 cursor-pointer;
 }
+.add-btn{
+    @apply flex items-center gap-1.5 text-xs md:text-sm font-medium text-gray-600 whitespace-nowrap bg-purple-50 border border-purple-100 rounded-lg px-4 py-3 cursor-pointer hover:text-purple-500;
+}
+.add-btn-fill{
+    @apply text-white bg-primarty
+}

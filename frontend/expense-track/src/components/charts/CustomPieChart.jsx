@@ -1,4 +1,6 @@
 import React from 'react';
+import CustomLegend from './CustomLengend';
+import CustomTooltip from './CustomTooltio';
 import { PieChart,
     Pie,
     Cell,Tooltip,ResponsiveContainer,Legend
@@ -31,7 +33,7 @@ const CustomPieChart=({
         ) )}
     </Pie>
     <Tooltip content={<CustomTooltip/>}/>
-    <Legend/>
+    <Legend content={<CustomLegend/>}/>
 
     {showTextAnchor && (
         <>
