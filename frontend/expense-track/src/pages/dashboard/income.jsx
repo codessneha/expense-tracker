@@ -1,13 +1,24 @@
 import react from 'react';
 import { useState } from 'react';
 import DashboardLayout from '../../components/layouts/DashboardLayout';
-import IncomeOverview from '../../components/Dashboard/IncomeOverview';
-import { API_PATHS } from '../../utils/apipath';
+import IncomeOverview from '../../components/income/IncomeOverview';
+import { API_PATH } from '../../utils/apipath';
 import axiosInstance from '../../utils/axiosInstance';
 import { PiFileRsThin } from 'react-icons/pi';
 import { MdOutlineAlarmAdd } from 'react-icons/md';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
+import IncomeList from '../../components/income/IncomeList';
+import Modal from '../../components/Modal';
+import AddIncomeForm from '../../components/income/AddIncomeForm';
+import moment from 'moment';
+import { useUserAuth } from '../../hooks/useUserAuth';
+import { useUserContext } from '../../context/userContext';
+
+
+
 const Income=()=>{
-    const [incomeData,setIncomeData]=useState(null);
+    const [incomeData, setIncomeData] = useState([]);
     const [loading,setLoading]=useState(false);
     const [error,setError]=useState(null);
     const [openDeleteAlert,setOpenDeleteAlert]=useState({
@@ -21,7 +32,7 @@ const Income=()=>{
         if(loading) return;
         setLoading(true);
         try{
-            const response=await axiosInstance.get(API_PATHS.INCOME.GET_ALL_INCOME);
+            const response=await axiosInstance.get(API_PATH.INCOME.GET_ALL_INCOME);
             if(response.data){
                 setIncomeData(response.data);
             }
@@ -35,13 +46,13 @@ const Income=()=>{
 
     //handle add income
     const handleAddIncome=async(income)=>{
-        const {source,aount,date,icon}=income;
-        if(!source || !aount || !date || !icon){
+        const {source,amount,date,icon}=income;
+        if(!source || !amount || !date || !icon){
             toast.error("All fields are required");
             return;
         }
         try{
-            const response=await axiosInstance.post(API_PATHS.INCOME.ADD_INCOME,{
+            const response=await axiosInstance.post(API_PATH.INCOME.ADD_INCOME,{
                 source,
                 amount,
                 date,
@@ -49,18 +60,24 @@ const Income=()=>{
             });
             if(response.data){
                 setOpenAddIncomeModel(false);
-                fetchIncomeDetails();
+                // Refresh both income list and dashboard data
+                await Promise.all([
+                    fetchIncomeDetails(),
+                    // Trigger dashboard data refresh by sending a custom event
+                    window.dispatchEvent(new Event('dashboard-data-changed'))
+                ]);
+                toast.success("Income added successfully!");
             }
         }catch(error){
-            console.log(error);
-            toast.error(error.message);
+            console.error('Error adding income:', error);
+            toast.error(error.response?.data?.message || error.message || "Failed to add income");
         }
     };
 
     //handle delete income
     const deleteIncome=async(id)=>{
         try{
-            const response=await axiosInstance.delete(API_PATHS.INCOME.DELETE_INCOME,{
+            const response=await axiosInstance.delete(API_PATH.INCOME.DELETE_INCOME,{
                 data:{id},
             });
             if(response.data){
@@ -73,9 +90,28 @@ const Income=()=>{
     };
 
     //handle download income details
-    const handleDownloadIncomeDetails=async ()=>{};
+    const handleDownloadIncomeDetails=async ()=>{
+        try{
+            const response=await axiosInstance.get(API_PATH.INCOME.GET_ALL_INCOME,{
+                responseType:"blob",
+            });
+            if(response.data){
+                //create url for blob
+                const url=window.URL.createObjectURL(new Blob([response.data]));
+                const link=document.createElement("a");
+                link.href=url;
+                link.setAttribute("download","income-details.csv");
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+            }
+        }catch(error){
+            console.log(error);
+            toast.error(error.message);
+        }
+    };
 
-    UseEffect(()=>{
+    useEffect(()=>{
         fetchIncomeDetails();
         return ()=>{};
     },[]);

@@ -48,6 +48,29 @@ exports.registerUser = async (req, res, next) => {
   }
 };
 
+// @desc    Get user info
+// @route   GET /api/v1/auth/getUserInfo
+// @access  Private
+exports.getUserInfo = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+    
+    res.status(200).json({
+      success: true,
+      data: user
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @desc    Auth user & get token
 // @route   POST /api/v1/auth/login
 // @access  Public

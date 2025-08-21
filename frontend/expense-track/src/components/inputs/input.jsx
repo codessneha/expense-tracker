@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FaRegEye, FaRegEyeSlash } from 'react-icons/fa6';
 
-const Input = ({ value, onChange, type, placeholder, label, required = false }) => {
+const Input = ({ name, value, onChange, type, placeholder, label, required = false }) => {
     const [showPassword, setShowPassword] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
 
@@ -19,6 +19,7 @@ const Input = ({ value, onChange, type, placeholder, label, required = false }) 
             )}
             <div className={`relative rounded-md shadow-sm ${isFocused ? 'ring-2 ring-violet-500' : ''}`}>
                 <input
+                    name={name}
                     type={type === 'password' ? (showPassword ? 'text' : 'password') : type}
                     placeholder={placeholder}
                     className={`

@@ -1,5 +1,5 @@
 import React from 'react';
-import TransactionsInfoCard from '../Dashboard/TransactionsInfoCard';
+import TransactionsInfoCard from '../cards/TransactionInfoCard';
 import moment from 'moment';
 import { LuDownload } from 'react-icons/lu';    
 
@@ -26,7 +26,7 @@ const IncomeList=({
                     title={income.source}
                     icon={income.icon}
                     date={moment(income.date).format('DD/MM/YYYY')}
-                    amount={item.amount}
+                    amount={income.amount}
                     type="income"
                     onDelete={()=>onDelete(income._id)}
                     />
@@ -38,3 +38,4 @@ const IncomeList=({
         </div>
     )
 }
+export default IncomeList;

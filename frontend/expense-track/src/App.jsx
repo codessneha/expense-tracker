@@ -14,7 +14,7 @@ import Home from './pages/dashboard/home';
 import Income from './pages/dashboard/income';
 import Expense from './pages/dashboard/expense';
 import { Toaster } from 'react-hot-toast';
-import { ToastContainer } from 'react-toastify';
+
 
 const Root = () => {
   const isAuthenticated = !!localStorage.getItem('token');

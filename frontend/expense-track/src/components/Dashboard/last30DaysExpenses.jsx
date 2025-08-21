@@ -1,28 +1,35 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { prepareExpenseBarChartData } from '../../utils/helper';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import CustomBarChart from '../charts/CustomBarChart';
 
-const Last30DaysExpenses=({data})=>{
+const Last30DaysExpenses = ({ data = {} }) => {
+    const [chartData, setChartData] = useState([]);
 
-    const [chartData, setChartData]=useState(null);
+    // Safely process the data
+    useEffect(() => {
+        try {
+            const processedData = Array.isArray(data) ? data : [];
+            const result = prepareExpenseBarChartData(processedData);
+            setChartData(Array.isArray(result) ? result : []);
+        } catch (error) {
+            console.error('Error processing chart data:', error);
+            setChartData([]);
+        }
+    }, [data]);
 
-    useEffect(()=>{
-        const result=prepareExpenseBarChartData(data);
-        setChartData(result);
-        return ()=>{};
-    },[data]);
-    return(
+    // Memoize the chart to prevent unnecessary re-renders
+    const memoizedChart = useMemo(() => (
+        <CustomBarChart data={chartData} />
+    ), [chartData]);
+
+    return (
         <div className="card col-span-1">
             <div className="flex items-center justify-between">
-            <h5 className="text-lg">Expenses</h5>
+                <h5 className="text-lg">Expenses</h5>
             </div>
-
-            <CustomBarChart
-            data={chartData}
-            
-            />
+            {memoizedChart}
         </div>
-    )
-}
+    );
+};
+
 export default Last30DaysExpenses;

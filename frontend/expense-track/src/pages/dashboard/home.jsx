@@ -12,6 +12,7 @@ import RecentTransactions from '../../components/Dashboard/RecentTransactions';
 import ExpenseTransactions from '../../components/Dashboard/ExpenseTransactions';
 import Last30DaysExpenses from '../../components/Dashboard/last30DaysExpenses';
 import { addThousandsSeperator } from '../../utils/helper';
+import RecentIncome from '../../components/Dashboard/RecentIncome';
 
 import FinanceOverview from '../../components/Dashboard/FinanceOverview';
 const Home=()=>{
@@ -25,10 +26,16 @@ const Home=()=>{
     const fetchDashboardData=async()=>{
         if(loading) return;
         setLoading(true);
+        console.log('Fetching dashboard data...');
         try{
             const response=await axiosInstance.get(API_PATH.DASHBOARD.GET_DATA);
-            if(response.data){
+            console.log('Dashboard API Response:', response);
+            if(response && response.data){
+                console.log('Dashboard Data:', response.data);
                 setDashboardData(response.data);
+            } else {
+                console.warn('No data in dashboard response');
+                setDashboardData(null);
             }
         }catch(error){
             console.log(error);
@@ -39,7 +46,18 @@ const Home=()=>{
     }
     useEffect(()=>{
         fetchDashboardData();
-        return ()=> {};
+        
+        // Add event listener for dashboard data refresh
+        const handleDashboardChange = () => {
+            fetchDashboardData();
+        };
+        
+        window.addEventListener('dashboard-data-changed', handleDashboardChange);
+        
+        // Cleanup
+        return () => {
+            window.removeEventListener('dashboard-data-changed', handleDashboardChange);
+        };
     },[]);
 
     return(
@@ -83,12 +101,12 @@ const Home=()=>{
             />
 
             <ExpenseTransactions
-            transactions={dashboardData?.last30DaysExpenses?.transactions||{}}
-            onSeeMore={()=> navigate("/expense")}
+            transactions={dashboardData?.last30DaysExpenses?.transactions || []}
+            onSeeMore={() => navigate("/expense")}
             />
 
             <Last30DaysExpenses
-            data={dashboardData?.last30DaysExpenses?.transactions||{}}
+            data={dashboardData?.last30DaysExpenses?.transactions || []}
             />
 
             <RecentIncomeWithChart

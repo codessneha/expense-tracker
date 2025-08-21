@@ -1,8 +1,9 @@
 import React from 'react';
+import moment from 'moment';
 import TransactionsInfoCard from '../cards/TransactionInfoCard';
-import {LuArrowRight} from 'react-icons/lu';
+import { LuArrowRight } from 'react-icons/lu';
 
-const ExpenseTransactions=({transactions,onSeeMore})=>{
+const ExpenseTransactions = ({ transactions = [], onSeeMore }) => {
     return(
         <div className="card">
             <div className="flex items-center justify-between">
@@ -12,7 +13,7 @@ const ExpenseTransactions=({transactions,onSeeMore})=>{
             </div>
 
             <div className="mt-6">
-                {transactions?.slice(0,5)?.map((expense)=>(
+                {Array.isArray(transactions) && transactions.slice(0, 5).map((expense) => (
                     <TransactionsInfoCard
                     key={expense._id}
                     title={expense.type=='expense' ? expense.category : expense.incomeSource}

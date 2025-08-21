@@ -14,7 +14,8 @@ export const useUserAuth=()=>{
         let isMounted=true;
         const fetchUser=async()=>{
             try{
-                const response=await axiosInstance.get(API_PATH.AUTH.GET_USER);
+                // Use GET_USER_INFO which is already defined in the API paths
+                const response=await axiosInstance.get(API_PATH.AUTH.GET_USER_INFO);
                 
                 if(isMounted && response.data){
                     updateUser(response.data);

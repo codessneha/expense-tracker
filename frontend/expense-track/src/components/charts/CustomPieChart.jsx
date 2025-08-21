@@ -1,17 +1,22 @@
 import React from 'react';
 import CustomLegend from './CustomLengend';
-import CustomTooltip from './CustomTooltio';
-import { PieChart,
+import CustomTooltip from './CustomTooltip';
+import {
+    PieChart,
     Pie,
-    Cell,Tooltip,ResponsiveContainer,Legend
- } from 'react-chartjs-2';
+    Cell,
+    Tooltip,
+    ResponsiveContainer,
+    Legend
+  } from 'recharts';
+  
 
 const CustomPieChart=({
-    data,
-    label,
-    totalAmount,
-    colours,
-    showTextAnchor
+    data = [],
+    label = "",
+    totalAmount = 0,
+    colours = ["#0088FE", "#00C49F", "#FFBB28", "#FF8042", "#8884d8", "#82ca9d"],
+    showTextAnchor = false
 })=>{
     return <ResponsiveContainer width="100%" height="380">
     <PieChart>
@@ -25,12 +30,12 @@ const CustomPieChart=({
         innerRadius={100}
         labelLine={false}
         >
-        {data.map((entry, index)=>(
+        {data && data.map((entry, index) => (
             <Cell
-            key={`cell-${index}`}
-            fill={colours[index%colours.length]}
+              key={`cell-${index}`}
+              fill={colours[index % colours.length]}
             />
-        ) )}
+        ))}
     </Pie>
     <Tooltip content={<CustomTooltip/>}/>
     <Legend content={<CustomLegend/>}/>
