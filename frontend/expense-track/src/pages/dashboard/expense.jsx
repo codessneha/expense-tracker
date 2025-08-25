@@ -50,12 +50,8 @@ const Expense = () => {
     }
 
     //handle add expense
-    console.log('handleAddExpense function is defined');
     const handleAddExpense = async (expense) => {
         console.log('handleAddExpense called with:', expense);
-        console.log('=== handleAddExpense called ===');
-        console.log('Expense data:', JSON.stringify(expense, null, 2));
-        
         const { category, amount, date, icon } = expense;
         
         // Validate required fields
@@ -72,22 +68,12 @@ const Expense = () => {
         }
         
         try {
-            const token = localStorage.getItem('token');
-            console.log('🔑 Token from localStorage:', token ? 'Token exists' : 'No token found');
-            
             const requestData = {
                 category,
                 amount: parseFloat(amount),
-                date: date, // Ensure date is in the correct format
+                date: date,
                 icon,
             };
-            
-            console.log('📤 Sending request to:', `${axiosInstance.defaults.baseURL}${API_PATH.EXPENSE.ADD_EXPENSE}`);
-            console.log('📦 Request payload:', JSON.stringify(requestData, null, 2));
-            console.log('🔑 Request headers:', {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            });
             
             const response = await axiosInstance.post(API_PATH.EXPENSE.ADD_EXPENSE, requestData, {
                 headers: {
@@ -95,28 +81,18 @@ const Expense = () => {
                 }
             });
             
-            console.log('✅ API Response:', {
-                status: response.status,
-                statusText: response.statusText,
-                data: response.data
-            });
+            console.log('✅ API Response:', response.data);
             
-            if (response.data) {
-                console.log('🔄 Refreshing data...');
-                setOpenAddExpenseModel(false);
-                
-                try {
-                    await Promise.all([
-                        fetchExpenseDetails(),
-                        window.dispatchEvent(new Event('dashboard-data-changed'))
-                    ]);
-                    console.log('✅ Data refreshed successfully');
-                    toast.success("Expense added successfully!");
-                } catch (refreshError) {
-                    console.error('❌ Error refreshing data:', refreshError);
-                    toast.error("Expense added but there was an error refreshing the data");
-                }
-            }
+            // Close the modal and refresh the expense list
+            setOpenAddExpenseModel(false);
+            
+            // Refresh expense list and trigger dashboard update
+            await fetchExpenseDetails();
+            
+            // Dispatch event to refresh dashboard data
+            window.dispatchEvent(new Event('dashboard-data-changed'));
+            
+            toast.success('Expense added successfully!');
         } catch (error) {
             console.error('❌ Error adding expense:', {
                 message: error.message,
@@ -141,17 +117,39 @@ const Expense = () => {
     };
 
     //handle delete expense
-    const deleteExpense=async(id)=>{
-      try{
-        const response=await axiosInstance.delete(API_PATH.EXPENSE.DELETE_EXPENSE,{
-          data:{id},
-        });
-        if(response.data){
+    const deleteExpense = async (id) => {
+      if (!id) {
+        console.error('No ID provided for deletion');
+        toast.error('Error: No expense ID provided');
+        return;
+      }
+      
+      try {
+        console.log('Attempting to delete expense with ID:', id);
+        
+        // Get the URL with the ID properly interpolated
+        const deleteUrl = API_PATH.EXPENSE.DELETE_EXPENSE(id);
+        console.log('Delete URL:', deleteUrl);
+        
+        // Using PUT instead of DELETE to match the backend route
+        const response = await axiosInstance.put(deleteUrl);
+        
+        console.log('Delete response:', response);
+        
+        if (response.data && response.data.success) {
+          toast.success('Expense deleted successfully');
           fetchExpenseDetails();
+        } else {
+          throw new Error(response.data?.message || 'Failed to delete expense');
         }
-      }catch(error){
-        console.log(error);
-        toast.error(error.message);
+      } catch (error) {
+        console.error('Error deleting expense:', error);
+        const errorMessage = error.response?.data?.message || 
+                           error.message || 
+                           'Failed to delete expense';
+        toast.error(errorMessage);
+      } finally {
+        setOpenDeleteAlert({ show: false, data: null });
       }
     };
 
@@ -215,16 +213,23 @@ const Expense = () => {
       </Modal>
 
       <Modal
-      isOpen={openDeleteAlert.show}
-      onClose={()=>setOpenDeleteAlert({show:false,data:null})}
-      title="Delete Expense"
+        isOpen={openDeleteAlert.show}
+        onClose={() => setOpenDeleteAlert({ show: false, data: null })}
+        title="Delete Expense"
       >
         <p>Are you sure you want to delete this expense?</p>
-        <div className="flex justify-end mt-6">
+        <div className="flex justify-end gap-4 mt-6">
           <button
             type="button"
-            onClick={()=>deleteExpense(openDeleteAlert.data.id)}
-            className="add-btn add-btn-fill"
+            onClick={() => setOpenDeleteAlert({ show: false, data: null })}
+            className="px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={() => deleteExpense(openDeleteAlert.data?.id)}
+            className="px-4 py-2 text-white bg-red-600 rounded-md hover:bg-red-700"
           >
             Delete
           </button>

@@ -22,13 +22,14 @@ const CustomPieChart=({
     <PieChart>
         <Pie
         data={data}
-        dataKey="amount"
+        dataKey="value"
         nameKey="name"
         cx="50%"
         cy="50%"
         outerRadius={130}
         innerRadius={100}
         labelLine={false}
+        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
         >
         {data && data.map((entry, index) => (
             <Cell

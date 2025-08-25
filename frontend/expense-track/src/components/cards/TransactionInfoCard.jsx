@@ -25,11 +25,13 @@ const TransactionInfoCard=({
     }
     return(
         <div className="group relative flex items-center justify-between gap-4 mt-2 p-3 rounded-lg hover:bg-gray-100/60 ">
-            <div className="w-12 h-12 flex items-center justify-center text-xl text-gray-900 rounded-full drop-shadow-xl">
-                {icon?(
+            <div className="w-12 h-12 flex items-center justify-center text-2xl bg-white rounded-full drop-shadow-xl">
+                {icon?.startsWith('http') ? (
                     <img src={icon} alt={title} className="w-6 h-6"/>
-                ):(
-                    <LuUtensils/>
+                ) : icon ? (
+                    <span>{icon}</span>
+                ) : (
+                    <LuUtensils className="text-gray-600"/>
                 )}
             </div>
 

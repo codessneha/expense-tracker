@@ -4,8 +4,10 @@ import { LuArrowRight } from 'react-icons/lu';
 import moment from 'moment';
 
 const RecentIncome = ({ transactions = [], onSeeMore }) => {
+    console.log('RecentIncome - transactions:', transactions);
     // Ensure transactions is an array and has items before mapping
     const recentTransactions = Array.isArray(transactions) ? transactions.slice(0, 5) : [];
+    console.log('RecentIncome - recentTransactions:', recentTransactions);
 
     return (
         <div className="card">
@@ -24,7 +26,7 @@ const RecentIncome = ({ transactions = [], onSeeMore }) => {
                     recentTransactions.map((item) => (
                         <TransactionsInfoCard
                             key={item._id || Math.random().toString(36).substr(2, 9)}
-                            title={item.source || 'Unknown Source'}
+                            title={item.incomeSource || item.source || 'Unknown Source'}
                             icon={item.icon || '💰'}
                             date={item.date ? moment(item.date).format('DD/MM/YYYY') : 'N/A'}
                             amount={item.amount || 0}
